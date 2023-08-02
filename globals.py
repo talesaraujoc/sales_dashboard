@@ -15,5 +15,7 @@ df.drop(columns=['Duração da chamada'], axis=1, inplace=True)
 df['Duração da chamada (min)'] = df['Horas'].apply(lambda x: x*60) + df['Minutos']
 df.drop(columns=['Horas', 'Minutos'], axis=1, inplace=True)
 
-lista_meses = df['Mês'].unique().tolist()
-lista_meses.append("Ano Todo")
+lista_meses = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez", "Ano Todo"]
+
+lista_equipes = df['Equipe'].unique().tolist()
+lista_equipes.append("Todas")

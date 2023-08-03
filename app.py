@@ -36,15 +36,18 @@ app.layout = html.Div([
         
         dbc.Row([dbc.Col(dbc.Row(dbc.Card(dbc.CardBody([dbc.Row(dcc.Graph(id='grafico-r2/c1/r1')), dbc.Row(dcc.Graph(id='grafico-r2/c1/r2'))]))), lg=5), 
                  dbc.Col([
-                            dbc.Row([dbc.Col([], lg=6), dbc.Col([], lg=6)]), 
-                            dbc.Row(dcc.Graph(id='grafico-r2/c2/r2'))
+                            dbc.Row([
+                                    dbc.Col(dbc.Row(dbc.Card(dbc.CardBody([dcc.Graph(id='grafico-r2/c2/r1')]))), lg=6), 
+                                    dbc.Col(dbc.Row(dbc.Card(dbc.CardBody([dcc.Graph(id='grafico-r2/c2/r1/c2')]))), lg=6)
+                                     ]), 
+                            dbc.Row(dbc.Card(dbc.CardBody([dcc.Graph(id='grafico-r2/c2/r2')])))
                             ], lg=4), 
                  dbc.Col(dbc.Row(dbc.Card(dbc.CardBody([dcc.Graph(id='grafico-r2/c3')]))), lg=3)]),
         
         
-        dbc.Row([dbc.Col([dcc.Graph(id='grafico-r3/c1')], lg=2), 
-                 dbc.Col([], lg=5), 
-                 dbc.Col([], lg=3), 
+        dbc.Row([dbc.Col(dbc.Row(dbc.Card(dbc.CardBody([dcc.Graph(id='grafico-r3/c1')]))), lg=2), 
+                 dbc.Col(dbc.Row(dbc.Card(dbc.CardBody([dcc.Graph(id='grafico-r3/c2')]))), lg=5), 
+                 dbc.Col([dcc.Graph(id='grafico-r3/c3')], lg=3), 
                  dbc.Col(dbc.Row(dbc.Card(dbc.CardBody([html.H6('Escolha o mês:'), dcc.RadioItems(id='radio-equipes', options=lista_equipes, value=lista_equipes[0]), html.Div(id='disparador-equipes', style={'margin-top':'30px', 'margin-bottom':'30px'})]))), lg=2)])
     ])
 ])
@@ -268,7 +271,7 @@ def update_grafico_pizza_c3(meses, equipe):
             df_target_teta = df.loc[df['Mês']==meses]
             df_target_teta = df_target_teta[df_target_teta['Equipe']==equipe]
     
-    fig = go.Figure(data=[go.Pie(labels=df_target_teta['Meio de Propaganda'], hole=0.7, textinfo='percent', showlegend=False)])
+    fig = go.Figure(data=[go.Pie(labels=df_target_teta['Meio de Propaganda'],values=df_target_teta['Valor Pago'] ,hole=0.7, textinfo='percent', showlegend=False)])
     
     fig.update_layout(title_text="DISTRIBUIÇÃO DE PROPAGANDA", width=300,height=175)
     
@@ -276,6 +279,117 @@ def update_grafico_pizza_c3(meses, equipe):
     fig.update_layout({'margin': {'l':0, 'r':0, 't': 30, 'b':0}})
     
     return fig 
+    
+@app.callback(
+    Output('grafico-r3/c2', 'figure'),
+    Input('radio-equipes', 'value')
+)
+def update_grafico_propagandas(equipes):
+    if equipes == 'Todas':
+        df_meio_prop = dff.groupby(['Meio de Propaganda', 'Mês']).agg({'Valor Pago':'sum'})
+        df_meio_prop = df_meio_prop.reset_index()
+    else:
+        df_meio_prop = dff.loc[dff['Equipe']==equipes]
+        df_meio_prop = df_meio_prop.groupby(['Meio de Propaganda', 'Mês']).agg({'Valor Pago':'sum'})
+        df_meio_prop = df_meio_prop.reset_index()
+    
+    fig = px.line(df_meio_prop, x='Mês', y='Valor Pago', color='Meio de Propaganda', title="Valores de Propagandas Convertidas por Mês")
+    
+    fig.update_layout(height=200)
+    fig.update_layout(paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)')
+    fig.update_layout({'margin': {'l':0, 'r':0, 't': 30, 'b':0}})
+    
+    return fig
+
+
+@app.callback(
+    Output('grafico-r2/c2/r1', 'figure'),
+    Input('radio-meses', 'value')
+)
+def update_indicator_um(meses):
+    if meses == 'Ano Todo':
+        df5 = df.groupby('Consultor').agg({'Valor Pago':'sum'})
+    else:
+        df5 = df.loc[df['Mês']==meses]
+        df5 = df5.groupby('Consultor').agg({'Valor Pago':'sum'})
+    
+    df5 = df5.sort_values(by='Valor Pago', ascending=False)
+    df5 = df5.reset_index()
+    
+    fig7 = go.Figure()
+    fig7.add_trace(go.Indicator(
+                            mode='number+delta', 
+                            title = {"text": f"<span>{df5['Consultor'].iloc[0]} - Top Consultant</span><br><span style='font-size:70%'>Em vendas - em relação a média</span><br>"},
+                            value = df5['Valor Pago'].iloc[0],
+                            number = {'prefix':"R$"},
+                            delta = {'relative':True, 'valueformat':'.1%', 'reference':df5['Valor Pago'].mean()}
+                            ))
+    
+    fig7.update_layout(height=250)
+    fig7.update_layout(paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)')
+    fig7.update_layout(update_grafico)
+    
+    return fig7
+
+
+@app.callback(
+    Output('grafico-r2/c2/r1/c2', 'figure'),
+    Input('radio-meses', 'value')
+)
+def update_indicator_dois(meses):
+    if meses == 'Ano Todo':
+        df5 = df.groupby('Equipe').agg({'Valor Pago':'sum'})
+    else:
+        df5 = df.loc[df['Mês']==meses]
+        df5 = df5.groupby('Equipe').agg({'Valor Pago':'sum'})
+    
+    df5 = df5.sort_values(by='Valor Pago', ascending=False)
+    df5 = df5.reset_index()
+    
+    fig7 = go.Figure()
+    fig7.add_trace(go.Indicator(mode='number+delta', 
+                            title = {"text": f"<span>{df5['Equipe'].iloc[0]} - Top Team</span><br><span style='font-size:70%'>Em vendas - em relação a média</span><br>"},
+                            value = df5['Valor Pago'].iloc[0],
+                            number = {'prefix':"R$"},
+                            delta = {'relative':True, 'valueformat':'.1%', 'reference':df5['Valor Pago'].mean()}
+                            ))
+    
+    fig7.update_layout(height=250)
+    fig7.update_layout(paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)')
+    fig7.update_layout(update_grafico)
+    
+    return fig7
+
+@app.callback(
+    Output('grafico-r3/c3', 'figure'),
+    Input('radio-meses', 'value'),
+    Input('radio-equipes','value')
+)
+def update_indicator_c3(meses, equipe):
+    if meses == 'Ano Todo':
+        if equipe == 'Todas':
+            df_target_teta = df
+        else:
+            df_target_teta = df.loc[df['Equipe']==equipe]
+    else:
+        if equipe == 'Todas':
+            df_target_teta = df.loc[df['Mês']==meses]
+        else:
+            df_target_teta = df.loc[df['Mês']==meses]
+            df_target_teta = df_target_teta[df_target_teta['Equipe']==equipe]
+            
+    
+    fig7 = go.Figure()
+    fig7.add_trace(go.Indicator(mode='number', 
+                            title = {"text": "<span>Valor Total</span><br><span style='font-size:70%'>Em reais</span><br>"},
+                            value = df_target_teta['Valor Pago'].sum(),
+                            number = {'prefix':"R$"}
+                            ))
+    
+    fig7.update_layout(height=250)
+    fig7.update_layout(paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)')
+    fig7.update_layout(update_grafico)
+    
     
     
 # Servidor =================

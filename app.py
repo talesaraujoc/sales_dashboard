@@ -47,7 +47,7 @@ app.layout = html.Div([
         
         dbc.Row([dbc.Col(dbc.Row(dbc.Card(dbc.CardBody([dcc.Graph(id='grafico-r3/c1')]))), lg=2), 
                  dbc.Col(dbc.Row(dbc.Card(dbc.CardBody([dcc.Graph(id='grafico-r3/c2')]))), lg=5), 
-                 dbc.Col([dcc.Graph(id='grafico-r3/c3')], lg=3), 
+                 dbc.Col(dbc.Row(dbc.Card(dbc.CardBody([dcc.Graph(id='grafico-r3/c3')]))), lg=3), 
                  dbc.Col(dbc.Row(dbc.Card(dbc.CardBody([html.H6('Escolha o mês:'), dcc.RadioItems(id='radio-equipes', options=lista_equipes, value=lista_equipes[0]), html.Div(id='disparador-equipes', style={'margin-top':'30px', 'margin-bottom':'30px'})]))), lg=2)])
     ])
 ])
@@ -378,11 +378,12 @@ def update_indicator_c3(meses, equipe):
             df_target_teta = df.loc[df['Mês']==meses]
             df_target_teta = df_target_teta[df_target_teta['Equipe']==equipe]
             
+    valor = df_target_teta['Valor Pago'].sum()
     
     fig7 = go.Figure()
     fig7.add_trace(go.Indicator(mode='number', 
                             title = {"text": "<span>Valor Total</span><br><span style='font-size:70%'>Em reais</span><br>"},
-                            value = df_target_teta['Valor Pago'].sum(),
+                            value = valor,
                             number = {'prefix':"R$"}
                             ))
     
@@ -390,7 +391,7 @@ def update_indicator_c3(meses, equipe):
     fig7.update_layout(paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)')
     fig7.update_layout(update_grafico)
     
-    
+    return fig7
     
 # Servidor =================
 if __name__ == '__main__':

@@ -34,10 +34,18 @@ app.layout = html.Div([
             ]),
         
         
-        dbc.Row([dbc.Col([dbc.Row(dcc.Graph(id='grafico-r2/c1/r1')), dbc.Row(dcc.Graph(id='grafico-r2/c1/r2'))], lg=5), dbc.Col([dbc.Row([dbc.Col([], lg=6), dbc.Col([], lg=6)]), dbc.Row()], lg=4), dbc.Col([], lg=3)]),
+        dbc.Row([dbc.Col(dbc.Row(dbc.Card(dbc.CardBody([dbc.Row(dcc.Graph(id='grafico-r2/c1/r1')), dbc.Row(dcc.Graph(id='grafico-r2/c1/r2'))]))), lg=5), 
+                 dbc.Col([
+                            dbc.Row([dbc.Col([], lg=6), dbc.Col([], lg=6)]), 
+                            dbc.Row(dcc.Graph(id='grafico-r2/c2/r2'))
+                            ], lg=4), 
+                 dbc.Col(dbc.Row(dbc.Card(dbc.CardBody([dcc.Graph(id='grafico-r2/c3')]))), lg=3)]),
         
         
-        dbc.Row([dbc.Col([], lg=2), dbc.Col([], lg=5), dbc.Col([], lg=3), dbc.Col([html.H6('Escolha o mês:'), dcc.RadioItems(id='radio-equipes', options=lista_equipes, value=lista_equipes[0]), html.Div(id='disparador-equipes', style={'margin-top':'30px', 'margin-bottom':'30px'})], lg=2)])
+        dbc.Row([dbc.Col([dcc.Graph(id='grafico-r3/c1')], lg=2), 
+                 dbc.Col([], lg=5), 
+                 dbc.Col([], lg=3), 
+                 dbc.Col(dbc.Row(dbc.Card(dbc.CardBody([html.H6('Escolha o mês:'), dcc.RadioItems(id='radio-equipes', options=lista_equipes, value=lista_equipes[0]), html.Div(id='disparador-equipes', style={'margin-top':'30px', 'margin-bottom':'30px'})]))), lg=2)])
     ])
 ])
 
@@ -172,6 +180,7 @@ def update_grafico_02(mes, equipe):
     fig.add_annotation(text=f"Média : {round(df_y['Chamadas Realizadas'].mean(), 2)}", xref="paper", yref="paper", font=dict(size=15, color='gray'), align="center", bgcolor="rgba(0, 0, 0, 0.8)", x=0.05, y=0.55, showarrow=False)
     
     fig.update_layout(height=180)
+    fig.update_layout(paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)')
     fig.update_layout(update_grafico)
     
     return fig
@@ -182,9 +191,12 @@ def update_grafico_02(mes, equipe):
     Input('radio-equipes', 'value')
 )
 def update_grafico_03(equipe):
-    df_alpha = df.loc[df['Equipe']==equipe]
-    
-    df_alpha = df_alpha.groupby('Mês').agg({'Chamadas Realizadas':'sum'})
+    if equipe == 'Todas':
+        df_alpha = dff.groupby('Mês').agg({'Chamadas Realizadas':'sum'})
+        
+    else:
+        df_alpha = dff.loc[dff['Equipe']==equipe]
+        df_alpha = df_alpha.groupby('Mês').agg({'Chamadas Realizadas':'sum'})
 
     df_alpha = df_alpha.reset_index()
     
@@ -193,10 +205,79 @@ def update_grafico_03(equipe):
     fig.add_trace(go.Scatter(x=df_alpha['Mês'], y=df_alpha['Chamadas Realizadas'], mode='lines', fill='tonexty'))
     fig.add_annotation(text=f"Média : {round(df_alpha['Chamadas Realizadas'].mean(), 2)}", xref="paper", yref="paper", font=dict(size=15, color='gray'), align="center", bgcolor="rgba(0, 0, 0, 0.8)", x=0.05, y=0.55, showarrow=False)
     fig.update_layout(height=180)
+    fig.update_layout(paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)')
     fig.update_layout(update_grafico)
     
     return fig
 
+
+@app.callback(
+    Output('grafico-r2/c2/r2', 'figure'),
+    Input('grafico-r2/c2/r2', 'figure')
+)
+def update_grafico_04(fig):
+    fig = go.Figure(data = go.Scatter(x=df_vendas_geral['Mês'],y=df_vendas_geral['Valor Pago'], fill='tonexty' ,name="Venda Total"))
+    fig.add_trace(go.Scatter(x=df_vendas_geral_equipe_1['Mês'], y=df_vendas_geral_equipe_1['Valor Pago'], name="Equipe 1"))
+    fig.add_trace(go.Scatter(x=df_vendas_geral_equipe_2['Mês'], y=df_vendas_geral_equipe_2['Valor Pago'], name="Equipe 2"))
+    fig.add_trace(go.Scatter(x=df_vendas_geral_equipe_3['Mês'], y=df_vendas_geral_equipe_3['Valor Pago'], name="Equipe 3"))
+    fig.add_trace(go.Scatter(x=df_vendas_geral_equipe_4['Mês'], y=df_vendas_geral_equipe_4['Valor Pago'], name="Equipe 4"))
+    
+    fig.update_layout(height=180)
+    fig.update_layout(paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)')
+    fig.update_layout(update_grafico)
+    return fig
+    
+
+@app.callback(
+    Output('grafico-r2/c3', 'figure'),
+    Input('radio-meses','value')
+)
+def update_grafico_05(meses):
+    if meses == 'Ano Todo':
+        df_targetz = df.groupby('Equipe').agg({'Valor Pago':'sum'})
+        df_targetz = df_targetz.reset_index()
+    else:
+        df_targetz = df.loc[df['Mês']==meses]
+        df_targetz = df_targetz.groupby('Equipe').agg({'Valor Pago':'sum'})
+        df_targetz = df_targetz.reset_index()
+    
+    fig = px.bar(df_targetz, x=df_targetz['Valor Pago'], y=df_targetz['Equipe'], orientation='h')
+    
+    fig.update_layout(height=400)
+    fig.update_layout(paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)')
+    fig.update_layout(update_grafico)
+    
+    return fig
+
+
+@app.callback(
+    Output('grafico-r3/c1', 'figure'),
+    Input('radio-meses', 'value'),
+    Input('radio-equipes','value')
+)
+def update_grafico_pizza_c3(meses, equipe):
+    if meses == 'Ano Todo':
+        if equipe == 'Todas':
+            df_target_teta = df
+        else:
+            df_target_teta = df.loc[df['Equipe']==equipe]
+    else:
+        if equipe == 'Todas':
+            df_target_teta = df.loc[df['Mês']==meses]
+        else:
+            df_target_teta = df.loc[df['Mês']==meses]
+            df_target_teta = df_target_teta[df_target_teta['Equipe']==equipe]
+    
+    fig = go.Figure(data=[go.Pie(labels=df_target_teta['Meio de Propaganda'], hole=0.7, textinfo='percent', showlegend=False)])
+    
+    fig.update_layout(title_text="DISTRIBUIÇÃO DE PROPAGANDA", width=300,height=175)
+    
+    fig.update_layout(paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)')
+    fig.update_layout({'margin': {'l':0, 'r':0, 't': 30, 'b':0}})
+    
+    return fig 
+    
+    
 # Servidor =================
 if __name__ == '__main__':
     app.run_server(debug=True)

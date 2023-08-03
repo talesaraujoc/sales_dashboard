@@ -1,6 +1,7 @@
 import pandas as pd
 from datetime import time
 
+
 df = pd.read_csv('data/dataset_asimov.csv')
 
 
@@ -19,3 +20,31 @@ lista_meses = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "O
 
 lista_equipes = df['Equipe'].unique().tolist()
 lista_equipes.append("Todas")
+
+#new dataset meses numero
+dff = pd.read_csv('data/dataset_asimov.csv')
+dff['Valor Pago'] = dff['Valor Pago'].apply(lambda x: x.split(' ')[1])
+dff['Valor Pago'] = dff['Valor Pago'].apply(lambda x: float(x))
+
+
+dff['Mês'] = dff['Mês'].map({'Jan': 1, 'Fev': 2, 'Mar':3, 'Abr':4, 'Mai':5, 'Jun':6, 'Jul':7, 'Ago':8, 'Set':9, 'Out':10, 'Nov':11, 'Dez':12})
+
+#gráfico r2/c2/r2
+df_vendas_geral = dff.groupby('Mês').agg({'Valor Pago':'sum'})
+df_vendas_geral = df_vendas_geral.reset_index()
+
+df_vendas_geral_equipe_1 = dff.loc[dff['Equipe']=='Equipe 1']
+df_vendas_geral_equipe_1 = df_vendas_geral_equipe_1.groupby('Mês').agg({'Valor Pago':'sum'})
+df_vendas_geral_equipe_1 = df_vendas_geral_equipe_1.reset_index()
+
+df_vendas_geral_equipe_2 = dff.loc[dff['Equipe']=='Equipe 2']
+df_vendas_geral_equipe_2 = df_vendas_geral_equipe_2.groupby('Mês').agg({'Valor Pago':'sum'})
+df_vendas_geral_equipe_2 = df_vendas_geral_equipe_2.reset_index()
+
+df_vendas_geral_equipe_3 = dff.loc[dff['Equipe']=='Equipe 3']
+df_vendas_geral_equipe_3 = df_vendas_geral_equipe_3.groupby('Mês').agg({'Valor Pago':'sum'})
+df_vendas_geral_equipe_3 = df_vendas_geral_equipe_3.reset_index()
+
+df_vendas_geral_equipe_4 = dff.loc[dff['Equipe']=='Equipe 4']
+df_vendas_geral_equipe_4 = df_vendas_geral_equipe_4.groupby('Mês').agg({'Valor Pago':'sum'})
+df_vendas_geral_equipe_4 = df_vendas_geral_equipe_4.reset_index()

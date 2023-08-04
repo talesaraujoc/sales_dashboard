@@ -13,7 +13,7 @@ import dash_ag_grid as dag
 # Servidor
 load_figure_template("bootstrap")
 
-app = dash.Dash(external_stylesheets=[dbc.themes.BOOTSTRAP])
+app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
 server = app.server
 
 # DataFrame =================
@@ -30,7 +30,7 @@ app.layout = html.Div([
         dbc.Row([
             dbc.Col([], lg=2), 
             dbc.Col(dbc.Row(dbc.Card(dbc.CardBody([dcc.Graph(id='grafico-01-consultores-mes')]))), lg=7), 
-            dbc.Col(dbc.Row(dbc.Card(dbc.CardBody([html.H6('Escolha o mês:'), dcc.RadioItems(id='radio-meses', options=lista_meses, value=lista_meses[0]), html.Div(id='disparador-meses', style={'margin-top':'30px', 'margin-bottom':'30px'})]))), lg=3)
+            dbc.Col(dbc.Row(dbc.Card(dbc.CardBody([html.H6('Escolha o mês:'), dcc.RadioItems(id='radio-meses', options=lista_meses, value=lista_meses[0]), html.Div(id='disparador-meses')])), style={'height':'100%'}), lg=3)
             ]),
         
         
@@ -49,7 +49,7 @@ app.layout = html.Div([
                  dbc.Col(dbc.Row(dbc.Card(dbc.CardBody([dcc.Graph(id='grafico-r3/c2')]))), lg=5), 
                  dbc.Col(dbc.Row(dbc.Card(dbc.CardBody([dcc.Graph(id='grafico-r3/c3')]))), lg=3), 
                  dbc.Col(dbc.Row(dbc.Card(dbc.CardBody([html.H6('Escolha o mês:'), dcc.RadioItems(id='radio-equipes', options=lista_equipes, value=lista_equipes[0]), html.Div(id='disparador-equipes', style={'margin-top':'30px', 'margin-bottom':'30px'})]))), lg=2)])
-    ])
+    ],style={'margin-top':'7px', 'margin-left':'7px'})
 ])
 
 
@@ -103,7 +103,7 @@ def update_grafico_01(mes):
     fig.add_trace(go.Bar(x=df_grafico['Consultor'], y=df_grafico['Valor Pago'], showlegend=False), row=1, col=1)
     fig.add_trace(go.Pie(labels=lista_consultores, values=lista_valores, hole=0.6, showlegend=False), row=1, col=2)
     
-    fig.update_layout(height=220)
+    fig.update_layout(height=180)
     fig.update_layout(update_grafico)
     
     

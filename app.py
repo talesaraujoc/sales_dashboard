@@ -38,7 +38,7 @@ app.layout = html.Div([
             ]),
         
         
-        dbc.Row([dbc.Col(dbc.Row(dbc.Card(dbc.CardBody([dbc.Row(dcc.Graph(id='grafico-r2/c1/r1', className='dbc')), dbc.Row(dcc.Graph(id='grafico-r2/c1/r2', className='dbc'))]))), lg=5), 
+        dbc.Row([dbc.Col(dbc.Row(dbc.Card(dbc.CardBody([dbc.Row(dcc.Graph(id='grafico-r2/c1/r1', className='dbc', style={'margin-top':'70px'})), dbc.Row(dcc.Graph(id='grafico-r2/c1/r2', className='dbc', style={'margin-top':'50px'}))])), style={'height':'100%'}), lg=5), 
                  dbc.Col([
                             dbc.Row([
                                     dbc.Col(dbc.Row(dbc.Card(dbc.CardBody([dcc.Graph(id='grafico-r2/c2/r1', className='dbc')]))), lg=6), 
@@ -46,13 +46,13 @@ app.layout = html.Div([
                                      ]), 
                             dbc.Row(dbc.Card(dbc.CardBody([dcc.Graph(id='grafico-r2/c2/r2', className='dbc')])))
                             ], lg=4), 
-                 dbc.Col(dbc.Row(dbc.Card(dbc.CardBody([dcc.Graph(id='grafico-r2/c3', className='dbc')]))), lg=3)], style={'margin-top':'5px', 'margin-bottom':'5px'}),
+                 dbc.Col(dbc.Row(dbc.Card(dbc.CardBody([dcc.Graph(id='grafico-r2/c3', className='dbc')])), style={'height':'100%'}), lg=3)], style={'margin-top':'5px', 'margin-bottom':'5px'}),
         
         
-        dbc.Row([dbc.Col(dbc.Row(dbc.Card(dbc.CardBody([dcc.Graph(id='grafico-r3/c1', className='dbc')]))), lg=2), 
-                 dbc.Col(dbc.Row(dbc.Card(dbc.CardBody([dcc.Graph(id='grafico-r3/c2', className='dbc')]))), lg=5), 
-                 dbc.Col(dbc.Row(dbc.Card(dbc.CardBody([dcc.Graph(id='grafico-r3/c3', className='dbc')]))), lg=3), 
-                 dbc.Col(dbc.Row(dbc.Card(dbc.CardBody([html.H6('Escolha o mês:'), dcc.RadioItems(id='radio-equipes', options=lista_equipes, value=lista_equipes[0]), html.Div(id='disparador-equipes', style={'margin-top':'30px', 'margin-bottom':'30px'})]))), lg=2)])
+        dbc.Row([dbc.Col(dbc.Row(dbc.Card(dbc.CardBody([dcc.Graph(id='grafico-r3/c1', className='dbc')])), style={'height':'100%'}), lg=2), 
+                 dbc.Col(dbc.Row(dbc.Card(dbc.CardBody([dcc.Graph(id='grafico-r3/c2', className='dbc')])), style={'height':'100%'}), lg=5), 
+                 dbc.Col(dbc.Row(dbc.Card(dbc.CardBody([dcc.Graph(id='grafico-r3/c3', className='dbc')])), style={'height':'100%'}), lg=3), 
+                 dbc.Col(dbc.Row(dbc.Card(dbc.CardBody([html.H6('Escolha o mês:'), dcc.RadioItems(id='radio-equipes', options=lista_equipes, value=lista_equipes[0]), html.Div(id='disparador-equipes', style={'margin-top':'30px', 'margin-bottom':'30px'})])), style={'height':'100%'}), lg=2)])
     ], style={'margin-left':'10px', 'margin-top':'5px'})
 ])
 
@@ -192,7 +192,7 @@ def update_grafico_02(mes, equipe, toggle):
     fig.add_trace(go.Scatter(x=df_y['Dia'], y=df_y['Chamadas Realizadas'], mode='lines', fill='tonexty'))
     fig.add_annotation(text=f"Média : {round(df_y['Chamadas Realizadas'].mean(), 2)}", xref="paper", yref="paper", font=dict(size=15, color='gray'), align="center", bgcolor="rgba(0, 0, 0, 0.8)", x=0.05, y=0.55, showarrow=False)
     
-    fig.update_layout(height=180, template=template)
+    fig.update_layout(height=120, template=template)
     fig.update_layout(paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)')
     fig.update_layout(update_grafico)
     
@@ -220,7 +220,7 @@ def update_grafico_03(equipe, toggle):
     
     fig.add_trace(go.Scatter(x=df_alpha['Mês'], y=df_alpha['Chamadas Realizadas'], mode='lines', fill='tonexty'))
     fig.add_annotation(text=f"Média : {round(df_alpha['Chamadas Realizadas'].mean(), 2)}", xref="paper", yref="paper", font=dict(size=15, color='gray'), align="center", bgcolor="rgba(0, 0, 0, 0.8)", x=0.05, y=0.55, showarrow=False)
-    fig.update_layout(height=180, template=template)
+    fig.update_layout(height=120, template=template)
     fig.update_layout(paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)')
     fig.update_layout(update_grafico)
     
@@ -241,7 +241,7 @@ def update_grafico_04(fig, toggle):
     fig.add_trace(go.Scatter(x=df_vendas_geral_equipe_3['Mês'], y=df_vendas_geral_equipe_3['Valor Pago'], name="Equipe 3"))
     fig.add_trace(go.Scatter(x=df_vendas_geral_equipe_4['Mês'], y=df_vendas_geral_equipe_4['Valor Pago'], name="Equipe 4"))
     
-    fig.update_layout(height=180, template=template)
+    fig.update_layout(height=140, template=template)
     fig.update_layout(paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)')
     fig.update_layout(update_grafico)
     return fig
@@ -265,7 +265,7 @@ def update_grafico_05(meses, toggle):
     
     fig = px.bar(df_targetz, x=df_targetz['Valor Pago'], y=df_targetz['Equipe'], orientation='h', template=template)
     
-    fig.update_layout(height=400)
+    fig.update_layout(height=350)
     fig.update_layout(paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)')
     fig.update_layout(update_grafico)
     
@@ -429,4 +429,4 @@ def update_indicator_c3(meses, equipe, toggle):
     
 # Servidor =================
 if __name__ == '__main__':
-    app.run_server(debug=True)
+    app.run_server(debug=False)
